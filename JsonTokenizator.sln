@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonTokenizator", "JsonTokenizator\JsonTokenizator.csproj", "{D244F951-C1E9-4BE5-9F1A-E9D253D0B340}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D244F951-C1E9-4BE5-9F1A-E9D253D0B340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D244F951-C1E9-4BE5-9F1A-E9D253D0B340}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D244F951-C1E9-4BE5-9F1A-E9D253D0B340}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D244F951-C1E9-4BE5-9F1A-E9D253D0B340}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {197DC708-D253-45FC-80F6-52B337F97E94}
+	EndGlobalSection
+EndGlobal
