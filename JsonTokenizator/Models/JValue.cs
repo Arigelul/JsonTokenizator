@@ -9,5 +9,11 @@ namespace JsonTokenizator.Models
     internal class JValue : JToken
     {
         public object Value { get; set; }
+
+        public override JTokenType Type { get; }
+        public JValue(JTokenType type)
+        { 
+            Type = type;
+        }
     }
 }

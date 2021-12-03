@@ -10,5 +10,7 @@ namespace JsonTokenizator.Models
     {
         public string Name { get; set; }
         public JToken Value { get; set; }
+
+        public override JTokenType Type => JTokenType.Property;
     }
 }

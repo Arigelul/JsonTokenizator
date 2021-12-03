@@ -9,5 +9,7 @@ namespace JsonTokenizator.Models
     internal class JArray : JToken
     {
         public IEnumerable<JToken> Elements { get; set; }
+
+        public override JTokenType Type => JTokenType.Array;
     }
 }

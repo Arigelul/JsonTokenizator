@@ -31,17 +31,17 @@ namespace JsonTokenizator.Tools
             return File.ReadAllText(path);
         }
 
-        internal int GetRawTokenIndex(string sourceString, char delim_open, char delim_close)
+        internal int GetRawTokenIndex(string sourceString, char delimOpen, char delimClose)
         {
             var str = sourceString;
             int index = 0;
             while (str.Length > 0)
             {
-                int localIndex = str.IndexOf(delim_close) + 1;
+                int localIndex = str.IndexOf(delimClose, StringComparison.Ordinal) + 1;
                 if (localIndex != -1)
                 {
                     index += localIndex;
-                    if (sourceString.Substring(0, index).Count(c => c.Equals(delim_open)) == sourceString.Substring(0, index).Count(c => c.Equals(delim_close)))
+                    if (sourceString.Substring(0, index).Count(c => c.Equals(delimOpen)) == sourceString.Substring(0, index).Count(c => c.Equals(delimClose)))
                         return index;
                     str = str.Substring(localIndex);
                 }
@@ -52,7 +52,7 @@ namespace JsonTokenizator.Tools
 
         internal JObject GetJObject(string sourceString)
         {
-            var jObject = new JObject() { Type = JTokenType.Object };
+            var jObject = new JObject();
             if (sourceString.Length > 0)
             {
                 var jPropertiesList = new List<JProperty>();
@@ -75,16 +75,16 @@ namespace JsonTokenizator.Tools
         internal JProperty GetJProperty(string sourceString, out int lastIndex)
         {
             lastIndex = 0;
-            var jProperty = new JProperty() { Type = JTokenType.Property };
+            var jProperty = new JProperty();
             if (sourceString.Length > 0)
             {
-                int nameEndIndex = sourceString.IndexOf("\":");
+                int nameEndIndex = sourceString.IndexOf("\":", StringComparison.Ordinal);
                 if (nameEndIndex != -1)
                 {
                     jProperty.Name = sourceString.Substring(0, nameEndIndex + 1);
                     int valueStartIndex = nameEndIndex + 2;
                     int valueEndIndex = GetPropertyLastIndex(sourceString.Substring(valueStartIndex), sourceString[valueStartIndex]);
-                    jProperty.Value = new JValue { Value = sourceString.Substring(valueStartIndex, valueEndIndex) };
+                    jProperty.Value = new JValue(JTokenType.String) { Value = sourceString.Substring(valueStartIndex, valueEndIndex) };
                     lastIndex = nameEndIndex + valueEndIndex + 2;
                 }
             }

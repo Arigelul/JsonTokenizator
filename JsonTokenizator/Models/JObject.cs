@@ -8,6 +8,7 @@ namespace JsonTokenizator.Models
 {
     internal class JObject : JToken
     {
-        public IEnumerable<JProperty> Properties { get; set; }
+        public override JTokenType Type => JTokenType.Object;
+        public IEnumerable<JProperty>? Properties { get; set; }
     }
 }
