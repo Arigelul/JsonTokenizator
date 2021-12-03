@@ -6,7 +6,9 @@
         Array,
         Property,
         Integer,
+        Double,
         Float,
+        Long,
         String,
         Boolean,
         Null

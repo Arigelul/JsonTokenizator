@@ -10,13 +10,10 @@ namespace JsonTokenizator.Models
     {
         public string Name { get; set; }
         public JToken Value { get; set; }
-
         public override JTokenType Type => JTokenType.Property;
 
         public override string ToString()
         {
-            if (Name == "")
-                return $"Empty string : {Value}";
             return $"{Name} : {Value}";
         }
     }

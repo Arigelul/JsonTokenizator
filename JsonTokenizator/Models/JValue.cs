@@ -19,8 +19,6 @@ namespace JsonTokenizator.Models
         {
             if (Type == JTokenType.Null)
                 return "null";
-            if (Type == JTokenType.String && Value == "")
-                return "Empty string";
             return Value.ToString();
         }
     }

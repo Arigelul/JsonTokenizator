@@ -24,14 +24,14 @@ namespace JsonTokenizator.Tools
             }
         }
 
-        internal string ReadJson(string path = @"C:\Users\Igor\Desktop\Example1min.txt")
+        internal string ReadJson(string path = @"C:\Users\Igor\Desktop\Example2min.txt")
         {
             return File.ReadAllText(path);
         }
 
-        internal JObject GetJObject(string sourceString)
+        internal JObject GetJObject(string sourceString, JToken? parent = null)
         {
-            var jObject = new JObject();
+            var jObject = new JObject() { Parent = parent };
 
             if (String.IsNullOrEmpty(sourceString))
                 return jObject;
@@ -42,7 +42,7 @@ namespace JsonTokenizator.Tools
                 switch (sourceString[i])
                 {
                     case '\"':
-                        var jProperty = GetJProperty(sourceString.Substring(i), out int endPropertyIndex);
+                        var jProperty = GetJProperty(sourceString.Substring(i), out int endPropertyIndex, jObject);
                         jPropertiesList.Add(jProperty);
                         i += endPropertyIndex;
                         break;
@@ -52,9 +52,9 @@ namespace JsonTokenizator.Tools
             return jObject;
         }
 
-        internal JArray GetJArray(string sourceString)
+        internal JArray GetJArray(string sourceString, JToken? parent = null)
         {
-            JArray jArray = new JArray();
+            JArray jArray = new JArray() { Parent = parent };
 
             if (String.IsNullOrEmpty(sourceString))
                 return jArray;
@@ -63,7 +63,7 @@ namespace JsonTokenizator.Tools
 
             for (int i = 1; i < sourceString.Length; i++)
             {
-                var element = GetJPropertyValue(sourceString.Substring(i), out int length);
+                var element = GetJPropertyValue(sourceString.Substring(i), out int length, jArray);
                 elements.Add(element);
                 i += length;
             }
@@ -71,17 +71,17 @@ namespace JsonTokenizator.Tools
             return jArray;
         }
 
-        internal JProperty GetJProperty(string sourceString, out int lastIndex)
+        internal JProperty GetJProperty(string sourceString, out int lastIndex, JToken? parent = null)
         {
             lastIndex = 0;
-            var jProperty = new JProperty();
+            var jProperty = new JProperty() { Parent = parent };
 
             if (String.IsNullOrEmpty(sourceString))
                 return jProperty;
 
             jProperty.Name = GetJPropertyName(sourceString, out int nameEndIndex);
             var valueStartIndex = nameEndIndex + 2;
-            jProperty.Value = GetJPropertyValue(sourceString.Substring(valueStartIndex), out int valueEndIndex);
+            jProperty.Value = GetJPropertyValue(sourceString.Substring(valueStartIndex), out int valueEndIndex, jProperty);
             lastIndex = nameEndIndex + valueEndIndex + 2;
             return jProperty;
         }
@@ -94,7 +94,7 @@ namespace JsonTokenizator.Tools
             return sourceString.Substring(1, nameEndIndex - 1);
         }
 
-        internal JToken GetJPropertyValue(string sourceString, out int length)
+        internal JToken GetJPropertyValue(string sourceString, out int length, JToken? parent = null)
         {
             length = 0;
             var valueBody = String.Empty;
@@ -105,10 +105,15 @@ namespace JsonTokenizator.Tools
             if (char.IsDigit(sourceString[0])) //not done
             {
                 length = GetLengthValue(sourceString);
-                valueBody = sourceString.Substring(0, length);
-                var jValue = new JValue(JTokenType.Integer);
-                jValue.Value = Convert.ToInt64(valueBody);
-                return jValue;
+                valueBody = sourceString.Substring(0, length).Replace('.', ',');
+                if (int.TryParse(valueBody, out var intNumber))
+                    return new JValue(JTokenType.Integer) { Value = intNumber, Parent = parent };
+                if (long.TryParse(valueBody, out var longNumber))
+                    return new JValue(JTokenType.Long) { Value = longNumber };
+                if (length < 10 && float.TryParse(valueBody, out var floatNumber))
+                    return new JValue(JTokenType.Float) { Value = floatNumber, Parent = parent };
+                if (double.TryParse(valueBody, out var doubleNumber))
+                    return new JValue(JTokenType.Double) { Value = doubleNumber, Parent = parent };
             }
 
             switch (sourceString[0])
@@ -116,27 +121,27 @@ namespace JsonTokenizator.Tools
                 case '{':
                     length = GetRawTokenLastIndex(sourceString, '{', '}');
                     valueBody = sourceString.Substring(0, length);
-                    var jObject = GetJObject(valueBody);
+                    var jObject = GetJObject(valueBody, parent);
                     return jObject;
                 case '[':
                     length = GetRawTokenLastIndex(sourceString, '[', ']');
                     valueBody = sourceString.Substring(0, length);
-                    var jArray = GetJArray(valueBody);
+                    var jArray = GetJArray(valueBody, parent);
                     return jArray;
                 case 't':
                     length = 4;
-                    return new JValue(JTokenType.Boolean) { Value = true };
+                    return new JValue(JTokenType.Boolean) { Value = true, Parent = parent };
                 case 'f':
                     length = 5;
-                    return new JValue(JTokenType.Boolean) { Value = false };
+                    return new JValue(JTokenType.Boolean) { Value = false, Parent = parent };
                 case 'n':
                     length = 4;
                     return new JValue(JTokenType.Null);
                 case '\"':
                     length = GetLengthValue(sourceString, true);
                     if (length < 2)
-                        return new JValue(JTokenType.String) { Value = String.Empty };
-                    return new JValue(JTokenType.String) { Value = sourceString.Substring(1, length - 2) };
+                        return new JValue(JTokenType.String) { Value = String.Empty, Parent = parent };
+                    return new JValue(JTokenType.String) { Value = sourceString.Substring(1, length - 2), Parent = parent };
                 default:
                     return new JValue(JTokenType.Null);
             }

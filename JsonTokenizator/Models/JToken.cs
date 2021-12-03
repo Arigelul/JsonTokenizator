@@ -12,5 +12,6 @@ namespace JsonTokenizator.Models
         public JToken? Next { get; set; }
         public JToken? Previous { get; set; }
         public JToken? Parent { get; set; }
+        public abstract override string ToString();
     }
 }
