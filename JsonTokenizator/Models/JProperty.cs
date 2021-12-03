@@ -15,6 +15,8 @@ namespace JsonTokenizator.Models
 
         public override string ToString()
         {
+            if (Name == "")
+                return $"Empty string : {Value}";
             return $"{Name} : {Value}";
         }
     }

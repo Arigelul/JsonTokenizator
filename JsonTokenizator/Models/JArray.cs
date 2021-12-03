@@ -11,5 +11,13 @@ namespace JsonTokenizator.Models
         public IEnumerable<JToken> Elements { get; set; }
 
         public override JTokenType Type => JTokenType.Array;
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var element in Elements)
+                sb.Append(element.ToString() + '\n');
+            return sb.ToString();
+        }
     }
 }

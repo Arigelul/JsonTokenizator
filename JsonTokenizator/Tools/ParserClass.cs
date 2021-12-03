@@ -24,7 +24,7 @@ namespace JsonTokenizator.Tools
             }
         }
 
-        internal string ReadJson(string path = @"C:\Users\Igor\Desktop\Example2min.txt")
+        internal string ReadJson(string path = @"C:\Users\Igor\Desktop\Example1min.txt")
         {
             return File.ReadAllText(path);
         }
@@ -50,6 +50,25 @@ namespace JsonTokenizator.Tools
             }
             jObject.Properties = jPropertiesList.ToArray();
             return jObject;
+        }
+
+        internal JArray GetJArray(string sourceString)
+        {
+            JArray jArray = new JArray();
+
+            if (String.IsNullOrEmpty(sourceString))
+                return jArray;
+
+            var elements = new List<JToken>();
+
+            for (int i = 1; i < sourceString.Length; i++)
+            {
+                var element = GetJPropertyValue(sourceString.Substring(i), out int length);
+                elements.Add(element);
+                i += length;
+            }
+            jArray.Elements = elements;
+            return jArray;
         }
 
         internal JProperty GetJProperty(string sourceString, out int lastIndex)
@@ -102,7 +121,7 @@ namespace JsonTokenizator.Tools
                 case '[':
                     length = GetRawTokenLastIndex(sourceString, '[', ']');
                     valueBody = sourceString.Substring(0, length);
-                    var jArray = new JArray();
+                    var jArray = GetJArray(valueBody);
                     return jArray;
                 case 't':
                     length = 4;
@@ -110,15 +129,20 @@ namespace JsonTokenizator.Tools
                 case 'f':
                     length = 5;
                     return new JValue(JTokenType.Boolean) { Value = false };
+                case 'n':
+                    length = 4;
+                    return new JValue(JTokenType.Null);
                 case '\"':
-                    length = GetLengthValue(sourceString);
-                    return new JValue(JTokenType.String) { Value = sourceString.Substring(1, length - 1) };
+                    length = GetLengthValue(sourceString, true);
+                    if (length < 2)
+                        return new JValue(JTokenType.String) { Value = String.Empty };
+                    return new JValue(JTokenType.String) { Value = sourceString.Substring(1, length - 2) };
                 default:
                     return new JValue(JTokenType.Null);
             }
         }
 
-        internal int GetLengthValue(string sourceString)
+        internal int GetLengthValue(string sourceString, bool isString = false)
         {
             if (String.IsNullOrEmpty(sourceString))
                 return 0;
@@ -127,11 +151,15 @@ namespace JsonTokenizator.Tools
             {
                 switch (sourceString[i])
                 {
-                    case ',':
                     case ']':
                     case '}':
-                    case '\"':
                         return i;
+                    case ',':
+                        if (!isString)
+                            return i;
+                        break;
+                    case '\"':
+                        return i + 1;
                 }
             }
             return sourceString.Length;
