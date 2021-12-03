@@ -1,3 +1,5 @@
+using JsonTokenizator.Tools;
+
 namespace JsonTokenizator
 {
     internal static class Program
@@ -8,9 +10,11 @@ namespace JsonTokenizator
         [STAThread]
         static void Main()
         {
-            ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
-
+            //ApplicationConfiguration.Initialize();
+            //Application.Run(new Form1());
+            var parser = new ParserClass();
+            var token = parser.Parse(parser.ReadJson());
+            Console.WriteLine(token);
         }
     }
 }

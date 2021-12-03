@@ -12,10 +12,8 @@ namespace JsonTokenizator.Tools
     {
         internal JToken Parse(string json)
         {
-            if (json == null)
-            {
+            if (String.IsNullOrEmpty(json))
                 return new JObject();
-            }
 
             switch (json[0])
             {
@@ -31,13 +29,121 @@ namespace JsonTokenizator.Tools
             return File.ReadAllText(path);
         }
 
-        internal int GetRawTokenIndex(string sourceString, char delimOpen, char delimClose)
+        internal JObject GetJObject(string sourceString)
+        {
+            var jObject = new JObject();
+
+            if (String.IsNullOrEmpty(sourceString))
+                return jObject;
+
+            var jPropertiesList = new List<JProperty>();
+            for (int i = 0; i < sourceString.Length; i++)
+            {
+                switch (sourceString[i])
+                {
+                    case '\"':
+                        var jProperty = GetJProperty(sourceString.Substring(i), out int endPropertyIndex);
+                        jPropertiesList.Add(jProperty);
+                        i += endPropertyIndex;
+                        break;
+                }
+            }
+            jObject.Properties = jPropertiesList.ToArray();
+            return jObject;
+        }
+
+        internal JProperty GetJProperty(string sourceString, out int lastIndex)
+        {
+            lastIndex = 0;
+            var jProperty = new JProperty();
+
+            if (String.IsNullOrEmpty(sourceString))
+                return jProperty;
+
+            jProperty.Name = GetJPropertyName(sourceString, out int nameEndIndex);
+            var valueStartIndex = nameEndIndex + 2;
+            jProperty.Value = GetJPropertyValue(sourceString.Substring(valueStartIndex), out int valueEndIndex);
+            lastIndex = nameEndIndex + valueEndIndex + 2;
+            return jProperty;
+        }
+
+        internal string GetJPropertyName(string sourceString, out int nameEndIndex)
+        {
+            nameEndIndex = sourceString.IndexOf("\":", StringComparison.Ordinal);
+            if (nameEndIndex == -1 /*&& nameEndIndex != 1*/)
+                return String.Empty;
+            return sourceString.Substring(1, nameEndIndex - 1);
+        }
+
+        internal JToken GetJPropertyValue(string sourceString, out int length)
+        {
+            length = 0;
+            var valueBody = String.Empty;
+
+            if (String.IsNullOrEmpty(sourceString))
+                return new JValue(JTokenType.Null);
+
+            if (char.IsDigit(sourceString[0])) //not done
+            {
+                length = GetLengthValue(sourceString);
+                valueBody = sourceString.Substring(0, length);
+                var jValue = new JValue(JTokenType.Integer);
+                jValue.Value = Convert.ToInt64(valueBody);
+                return jValue;
+            }
+
+            switch (sourceString[0])
+            {
+                case '{':
+                    length = GetRawTokenLastIndex(sourceString, '{', '}');
+                    valueBody = sourceString.Substring(0, length);
+                    var jObject = GetJObject(valueBody);
+                    return jObject;
+                case '[':
+                    length = GetRawTokenLastIndex(sourceString, '[', ']');
+                    valueBody = sourceString.Substring(0, length);
+                    var jArray = new JArray();
+                    return jArray;
+                case 't':
+                    length = 4;
+                    return new JValue(JTokenType.Boolean) { Value = true };
+                case 'f':
+                    length = 5;
+                    return new JValue(JTokenType.Boolean) { Value = false };
+                case '\"':
+                    length = GetLengthValue(sourceString);
+                    return new JValue(JTokenType.String) { Value = sourceString.Substring(1, length - 1) };
+                default:
+                    return new JValue(JTokenType.Null);
+            }
+        }
+
+        internal int GetLengthValue(string sourceString)
+        {
+            if (String.IsNullOrEmpty(sourceString))
+                return 0;
+
+            for (int i = 1; i < sourceString.Length; i++)
+            {
+                switch (sourceString[i])
+                {
+                    case ',':
+                    case ']':
+                    case '}':
+                    case '\"':
+                        return i;
+                }
+            }
+            return sourceString.Length;
+        }
+
+        internal int GetRawTokenLastIndex(string sourceString, char delimOpen, char delimClose)
         {
             var str = sourceString;
-            int index = 0;
+            var index = 0;
             while (str.Length > 0)
             {
-                int localIndex = str.IndexOf(delimClose, StringComparison.Ordinal) + 1;
+                var localIndex = str.IndexOf(delimClose, StringComparison.Ordinal) + 1;
                 if (localIndex != -1)
                 {
                     index += localIndex;
@@ -48,84 +154,6 @@ namespace JsonTokenizator.Tools
                 else break;
             }
             return -1;
-        }
-
-        internal JObject GetJObject(string sourceString)
-        {
-            var jObject = new JObject();
-            if (sourceString.Length > 0)
-            {
-                var jPropertiesList = new List<JProperty>();
-                for (int i = 0; i < sourceString.Length; i++)
-                {
-                    switch (sourceString[i])
-                    {
-                        case '\"':
-                            var jProperty = GetJProperty(sourceString.Substring(i), out int endPropertyIndex);
-                            jPropertiesList.Add(jProperty);
-                            i += endPropertyIndex;
-                            break;
-                    }
-                }
-                jObject.Properties = jPropertiesList.ToArray();
-            }
-            return jObject;
-        }
-
-        internal JProperty GetJProperty(string sourceString, out int lastIndex)
-        {
-            lastIndex = 0;
-            var jProperty = new JProperty();
-            if (sourceString.Length > 0)
-            {
-                int nameEndIndex = sourceString.IndexOf("\":", StringComparison.Ordinal);
-                if (nameEndIndex != -1)
-                {
-                    jProperty.Name = sourceString.Substring(0, nameEndIndex + 1);
-                    int valueStartIndex = nameEndIndex + 2;
-                    int valueEndIndex = GetPropertyLastIndex(sourceString.Substring(valueStartIndex), sourceString[valueStartIndex]);
-                    jProperty.Value = new JValue(JTokenType.String) { Value = sourceString.Substring(valueStartIndex, valueEndIndex) };
-                    lastIndex = nameEndIndex + valueEndIndex + 2;
-                }
-            }
-            return jProperty;
-        }
-
-        internal int GetPropertyLastIndex(string sourceString, char param)
-        {
-            if (char.IsDigit(param))
-                return GetLengthValue(sourceString);
-
-            switch (param)
-            {
-                case '{':
-                    return GetRawTokenIndex(sourceString, '{', '}');
-                case '[':
-                    return GetRawTokenIndex(sourceString, '[', ']');
-                case 't':
-                case 'f':
-                case '\"':
-                    return GetLengthValue(sourceString);
-                default:
-                    return 0;
-            }
-        }
-
-        internal int GetLengthValue(string sourceString)
-        {
-            for (int i = 1; i < sourceString.Length; i++)
-            {
-                switch (sourceString[i])
-                {
-                    case ',':
-                    case ']':
-                    case '}':
-                        return i;
-                    case '\"':
-                        return i + 1;
-                }
-            }
-            return sourceString.Length;
         }
     }
 }

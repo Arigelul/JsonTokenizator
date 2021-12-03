@@ -11,9 +11,15 @@ namespace JsonTokenizator.Models
         public object Value { get; set; }
 
         public override JTokenType Type { get; }
-        public JValue(JTokenType type)
-        { 
+        public JValue(JTokenType type = JTokenType.Null)
+        {
             Type = type;
+        }
+        public override string ToString()
+        {
+            if (Value == null)
+                return string.Empty;
+            return Value.ToString();
         }
     }
 }

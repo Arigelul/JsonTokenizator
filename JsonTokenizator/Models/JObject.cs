@@ -10,5 +10,12 @@ namespace JsonTokenizator.Models
     {
         public override JTokenType Type => JTokenType.Object;
         public IEnumerable<JProperty>? Properties { get; set; }
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var prop in Properties)
+                sb.Append(prop.ToString() + '\n');
+            return sb.ToString();
+        }
     }
 }
