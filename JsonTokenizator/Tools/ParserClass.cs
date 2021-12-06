@@ -29,7 +29,7 @@ namespace JsonTokenizator.Tools
             return File.ReadAllText(path);
         }
 
-        internal JObject GetJObject(string sourceString, JToken? parent = null)
+        internal JObject GetJObject(string sourceString, JToken? parent = null, JToken? next = null, JToken? previous = null)
         {
             var jObject = new JObject() { Parent = parent };
 
@@ -48,11 +48,11 @@ namespace JsonTokenizator.Tools
                         break;
                 }
             }
-            jObject.Properties = jPropertiesList.ToArray();
+            jObject.Properties = GetNextPreviousTokens(jPropertiesList);
             return jObject;
         }
 
-        internal JArray GetJArray(string sourceString, JToken? parent = null)
+        internal JArray GetJArray(string sourceString, JToken? parent = null, JToken? next = null, JToken? previous = null)
         {
             JArray jArray = new JArray() { Parent = parent };
 
@@ -67,11 +67,11 @@ namespace JsonTokenizator.Tools
                 elements.Add(element);
                 i += length;
             }
-            jArray.Elements = elements;
+            jArray.Elements = GetNextPreviousTokens(elements);
             return jArray;
         }
 
-        internal JProperty GetJProperty(string sourceString, out int lastIndex, JToken? parent = null)
+        internal JProperty GetJProperty(string sourceString, out int lastIndex, JToken? parent = null, JToken? next = null, JToken? previous = null)
         {
             lastIndex = 0;
             var jProperty = new JProperty() { Parent = parent };
@@ -94,7 +94,7 @@ namespace JsonTokenizator.Tools
             return sourceString.Substring(1, nameEndIndex - 1);
         }
 
-        internal JToken GetJPropertyValue(string sourceString, out int length, JToken? parent = null)
+        internal JToken GetJPropertyValue(string sourceString, out int length, JToken? parent = null, JToken? next = null, JToken? previous = null)
         {
             length = 0;
             var valueBody = String.Empty;
@@ -119,12 +119,12 @@ namespace JsonTokenizator.Tools
             switch (sourceString[0])
             {
                 case '{':
-                    length = GetRawTokenLastIndex(sourceString, '{', '}');
+                    length = GetContainerLastIndex(sourceString, '{', '}');
                     valueBody = sourceString.Substring(0, length);
                     var jObject = GetJObject(valueBody, parent);
                     return jObject;
                 case '[':
-                    length = GetRawTokenLastIndex(sourceString, '[', ']');
+                    length = GetContainerLastIndex(sourceString, '[', ']');
                     valueBody = sourceString.Substring(0, length);
                     var jArray = GetJArray(valueBody, parent);
                     return jArray;
@@ -145,6 +145,21 @@ namespace JsonTokenizator.Tools
                 default:
                     return new JValue(JTokenType.Null);
             }
+        }
+
+        internal List<T> GetNextPreviousTokens<T>(List<T> tokens) where T : JToken
+        {
+            for (int i = 1; i < tokens.Count(); i++)
+            {
+                tokens[i].Previous = tokens[i - 1];
+                tokens[i - 1].Next = tokens[i];
+            }
+            if (tokens.Count > 1)
+            {
+                tokens[tokens.Count - 1].Previous = tokens[tokens.Count - 2];
+                tokens[0].Next = tokens[1];
+            }
+            return tokens;
         }
 
         internal int GetLengthValue(string sourceString, bool isString = false)
@@ -170,7 +185,7 @@ namespace JsonTokenizator.Tools
             return sourceString.Length;
         }
 
-        internal int GetRawTokenLastIndex(string sourceString, char delimOpen, char delimClose)
+        internal int GetContainerLastIndex(string sourceString, char delimOpen, char delimClose)
         {
             var str = sourceString;
             var index = 0;
