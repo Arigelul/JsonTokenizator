@@ -9,7 +9,6 @@ namespace JsonTokenizator.Models
     internal class JValue : JToken
     {
         public object Value { get; set; }
-
         public override JTokenType Type { get; }
         public JValue(JTokenType type)
         {
@@ -20,7 +19,7 @@ namespace JsonTokenizator.Models
             switch (Type)
             {
                 case JTokenType.String:
-                    return $"{Value}";
+                    return $"\"{Value}\"";
                 case JTokenType.Null:
                     return "null";
             }

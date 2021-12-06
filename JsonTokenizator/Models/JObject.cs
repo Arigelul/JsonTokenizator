@@ -10,7 +10,6 @@ namespace JsonTokenizator.Models
     {
         public override JTokenType Type => JTokenType.Object;
         public IEnumerable<JProperty>? Properties { get; set; }
-
         public override string ToString()
         {
             var sb = new StringBuilder();

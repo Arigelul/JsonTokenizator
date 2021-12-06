@@ -18,7 +18,7 @@ namespace JsonTokenizator.Tools
             switch (json[0])
             {
                 case '[':
-                    return new JArray();
+                    return GetJArray(json);
                 default:
                     return GetJObject(json);
             }
@@ -29,7 +29,7 @@ namespace JsonTokenizator.Tools
             return File.ReadAllText(path);
         }
 
-        internal JObject GetJObject(string sourceString, JToken? parent = null, JToken? next = null, JToken? previous = null)
+        internal JObject GetJObject(string sourceString, JToken? parent = null)
         {
             var jObject = new JObject() { Parent = parent };
 
@@ -52,7 +52,7 @@ namespace JsonTokenizator.Tools
             return jObject;
         }
 
-        internal JArray GetJArray(string sourceString, JToken? parent = null, JToken? next = null, JToken? previous = null)
+        internal JArray GetJArray(string sourceString, JToken? parent = null)
         {
             JArray jArray = new JArray() { Parent = parent };
 
@@ -71,7 +71,7 @@ namespace JsonTokenizator.Tools
             return jArray;
         }
 
-        internal JProperty GetJProperty(string sourceString, out int lastIndex, JToken? parent = null, JToken? next = null, JToken? previous = null)
+        internal JProperty GetJProperty(string sourceString, out int lastIndex, JToken? parent = null)
         {
             lastIndex = 0;
             var jProperty = new JProperty() { Parent = parent };
@@ -94,7 +94,7 @@ namespace JsonTokenizator.Tools
             return sourceString.Substring(1, nameEndIndex - 1);
         }
 
-        internal JToken GetJPropertyValue(string sourceString, out int length, JToken? parent = null, JToken? next = null, JToken? previous = null)
+        internal JToken GetJPropertyValue(string sourceString, out int length, JToken? parent = null)
         {
             length = 0;
             var valueBody = String.Empty;

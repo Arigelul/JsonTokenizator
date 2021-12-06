@@ -10,14 +10,8 @@ namespace JsonTokenizator
         [STAThread]
         static void Main()
         {
-            //ApplicationConfiguration.Initialize();
-            //Application.Run(new Form1());
-            var parser = new ParserClass();
-            var json = parser.ReadJson();
-            var token = parser.Parse(json);
-            var deparser = new DeparserClass();
-            var result = deparser.Deparse(token);
-            Console.WriteLine(result);
+            ApplicationConfiguration.Initialize();
+            Application.Run(new Form1());
         }
     }
 }

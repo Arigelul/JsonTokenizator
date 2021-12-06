@@ -9,16 +9,14 @@ namespace JsonTokenizator.Models
     internal class JArray : JToken
     {
         public IEnumerable<JToken>? Elements { get; set; }
-
         public override JTokenType Type => JTokenType.Array;
-
         public override string ToString()
         {
             var sb = new StringBuilder();
             int cnt = 0;
             var tabsNum = GetNumParents(ref cnt);
-            //sb.Append('\n');
-            //sb.Append('\t', tabsNum);
+            sb.Append('\n');
+            sb.Append('\t', tabsNum);
             sb.Append('[');
             if (Elements != null)
             {

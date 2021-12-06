@@ -13,7 +13,7 @@ namespace JsonTokenizator.Tools
         {
             var sb = new StringBuilder();
             sb.Append(jToken.ToString());
-            return sb.ToString ();
+            return sb.ToString();
         }
     }
 }
