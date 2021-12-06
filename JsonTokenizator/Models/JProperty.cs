@@ -8,13 +8,13 @@ namespace JsonTokenizator.Models
 {
     internal class JProperty : JToken
     {
-        public string Name { get; set; }
-        public JToken Value { get; set; }
+        public string? Name { get; set; }
+        public JToken? Value { get; set; }
         public override JTokenType Type => JTokenType.Property;
 
         public override string ToString()
         {
-            return $"{Name} : {Value}";
+            return $"\"{Name}\": {Value}";
         }
     }
 }

@@ -17,8 +17,13 @@ namespace JsonTokenizator.Models
         }
         public override string ToString()
         {
-            if (Type == JTokenType.Null)
-                return "null";
+            switch (Type)
+            {
+                case JTokenType.String:
+                    return $"{Value}";
+                case JTokenType.Null:
+                    return "null";
+            }
             return Value.ToString();
         }
     }

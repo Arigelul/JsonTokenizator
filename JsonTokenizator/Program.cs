@@ -14,9 +14,10 @@ namespace JsonTokenizator
             //Application.Run(new Form1());
             var parser = new ParserClass();
             var json = parser.ReadJson();
-            //var jArray = parser.GetJArray(json.Substring(127));
             var token = parser.Parse(json);
-            Console.WriteLine(token);
+            var deparser = new DeparserClass();
+            var result = deparser.Deparse(token);
+            Console.WriteLine(result);
         }
     }
 }

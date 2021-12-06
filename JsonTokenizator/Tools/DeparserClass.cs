@@ -11,8 +11,9 @@ namespace JsonTokenizator.Tools
     {
         internal string Deparse (JToken jToken)
         {
-            var sb = new StringBuilder ();
-            return sb.ToString();
+            var sb = new StringBuilder();
+            sb.Append(jToken.ToString());
+            return sb.ToString ();
         }
     }
 }

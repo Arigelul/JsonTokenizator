@@ -24,7 +24,7 @@ namespace JsonTokenizator.Tools
             }
         }
 
-        internal string ReadJson(string path = @"C:\Users\Igor\Desktop\Example2min.txt")
+        internal string ReadJson(string path = @"C:\Users\Igor\Desktop\Example1min.txt")
         {
             return File.ReadAllText(path);
         }
