@@ -10,7 +10,7 @@ namespace JsonTokenizator.Tools
 {
     internal class ParserClass
     {
-        internal string ReadJson(string path = @"Example1min.txt")
+        internal string ReadJson(string path = @"Example3min.txt")
         {
             return File.ReadAllText(path);
         }

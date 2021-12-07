@@ -13,7 +13,14 @@ namespace JsonTokenizator.Models
         public override JTokenType Type => JTokenType.Property;
         public override string ToString()
         {
-            return $"\"{Name}\": {Value}";
+            var sb = new StringBuilder();
+            sb.Append('\"');
+            sb.Append(Name);
+            sb.Append("\": ");
+            if (Value.Type == JTokenType.Array || Value.Type == JTokenType.Object)
+                sb.Append('\n');
+            sb.Append(Value.ToString());
+            return sb.ToString();
         }
     }
 }

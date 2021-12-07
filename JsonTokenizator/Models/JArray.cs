@@ -13,28 +13,25 @@ namespace JsonTokenizator.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            int tabsNum = 0;
-            GetNumParentsObject(ref tabsNum);
-            if (HasParent())
-            {
-                sb.Append('\n');
-                tabsNum--;
-            }
-            tabsNum *= 3;
-            sb.Append(' ', tabsNum);
+            int parentsNum = 0;
+            int delimeterCounter = 3;
+            GetNumParents(ref parentsNum);
+            parentsNum *= delimeterCounter;
+            sb.Append(' ', parentsNum);
             sb.Append('[');
             if (Elements != null)
             {
                 foreach (var element in Elements)
                 {
                     sb.Append('\n');
-                    sb.Append(' ', tabsNum + 3);
+                    if (element.Type != JTokenType.Object)
+                        sb.Append(' ', parentsNum + delimeterCounter);
                     sb.Append($"{element},");
                 }
                 sb.Remove(sb.Length - 1, 1);
             }
             sb.Append('\n');
-            sb.Append(' ', tabsNum);
+            sb.Append(' ', parentsNum);
             sb.Append(']');
             return sb.ToString();
         }
