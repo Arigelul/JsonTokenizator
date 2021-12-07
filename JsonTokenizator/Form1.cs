@@ -13,6 +13,8 @@ namespace JsonTokenizator
         {
             var parser = new ParserClass();
             var json = richTextBox1.Text;
+            if (String.IsNullOrEmpty(json))
+                json = parser.ReadJson();
             var token = parser.Parse(json);
             var deparser = new DeparserClass();
             var result = deparser.Deparse(token);

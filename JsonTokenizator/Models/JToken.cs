@@ -15,14 +15,18 @@ namespace JsonTokenizator.Models
         public bool HasParent() => Parent != null;
         public bool HasNext() => Next != null;
         public bool HasPrevious() => Previous != null;
-        public int GetNumParents(ref int counter)
+        public void GetNumParentsObject(ref int counter)
         {
             if (HasParent())
             {
-                counter++;
-                Parent.GetNumParents(ref counter);
+                if (Parent.Type != JTokenType.Array)
+                    counter++;
+                Parent.GetNumParentsObject(ref counter);
             }
-            return counter;
+        }
+        public void GetNumParentsArray(ref int counter)
+        {
+            
         }
         public abstract override string ToString();
     }
